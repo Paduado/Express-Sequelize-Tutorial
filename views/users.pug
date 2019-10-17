@@ -1,40 +1,44 @@
-extends layout
+doctype html
+html
+    head
+        title Users app
+        link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+        link(rel='stylesheet', href='/styles.css')
+    body
+        h1 Users
 
-block content
-    h1 Users
+        div(class="col-md-4")
+            h2 Create user
 
-    div(class="col-md-4")
-        h2 Create user
+            form(action="/users", method="post", class="well")
+                div(class="form-group")
+                    label(for="name")
+                        | Name
+                    input(type="text", name="name", class="form-control")
+                input(type="submit" class="btn btn-default")
 
-        form(action="/users", method="post", class="well")
-            div(class="form-group")
-                label(for="name")
-                    | Name
-                input(type="text", name="name", class="form-control")
-            input(type="submit" class="btn btn-default")
+        div(class="col-md-6")
+            h2 Users
 
-    div(class="col-md-6")
-        h2 Users
-
-        ul
-            each user in users
-                li
-                    strong
-                        = user.name
-                    | &nbsp;
-                    form(action="/users/" + user.id + "/delete", method="post", class="form-inline")
-                        button(type="submit" class="btn btn-xs btn-warning") delete
-                    ul
-                        li
-                            | Create task
-                            form(action="/users/" + user.id + "/tasks", method="post", class="form-inline")
-                                div(class="form-group")
-                                    input(type="text", name="title", class="input-sm form-control")
-                                    input(type="submit", class="btn btn-sm btn-default")
-                        each task in user.tasks
+            ul
+                each user in users
+                    li
+                        strong
+                            = user.name
+                        | &nbsp;
+                        form(action="/users/" + user.id + "/delete", method="post", class="form-inline")
+                            button(type="submit" class="btn btn-xs btn-warning") delete
+                        ul
                             li
-                                strong
-                                    = task.title
-                                | &nbsp;
-                                form(action="/users/" + user.id + "/tasks/" + task.id, method="delete", class="form-inline")
-                                    button(type="submit" class="btn btn-xs btn-warning") delete
+                                | Create task
+                                form(action="/users/" + user.id + "/tasks", method="post", class="form-inline")
+                                    div(class="form-group")
+                                        input(type="text", name="title", class="input-sm form-control")
+                                        input(type="submit", class="btn btn-sm btn-default")
+                            each task in user.tasks
+                                li
+                                    strong
+                                        = task.title
+                                    | &nbsp;
+                                    form(action="/users/" + user.id + "/tasks/" + task.id, method="delete", class="form-inline")
+                                        button(type="submit" class="btn btn-xs btn-warning") delete
