@@ -26,7 +26,7 @@ html
                         strong
                             = user.name
                         | &nbsp;
-                        form(action="/users/" + user.id + "/delete", method="post", class="form-inline")
+                        form(action="/users/" + user.id + "/delete", method="post", class="form-inline delete")
                             button(type="submit" class="btn btn-xs btn-warning") delete
                         ul
                             li
@@ -40,5 +40,5 @@ html
                                     strong
                                         = task.title
                                     | &nbsp;
-                                    form(action="/users/" + user.id + "/tasks/" + task.id, method="delete", class="form-inline")
+                                    form(action="/users/" + user.id + "/tasks/" + task.id + "/delete", method="post", class="form-inline delete")
                                         button(type="submit" class="btn btn-xs btn-warning") delete
