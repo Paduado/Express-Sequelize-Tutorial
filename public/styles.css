@@ -1,6 +1,6 @@
 body {
     padding: 50px;
-    font: 14px "Helvetica Neue","Open Sans",sans-serif;
+    font: 14px "Helvetica Neue", "Open Sans", sans-serif;
 }
 
 a {
@@ -17,4 +17,8 @@ h1 {
 
 ul li {
     padding: 5px;
+}
+
+.form-inline.delete {
+    display: contents;
 }

@@ -1,9 +1,15 @@
 # Express + Sequelize tutorial
-On this tutorial we will learn to create a Node.js web server, we will use [Express](https://expressjs.com) for managing our routes and views, and [Sequelize](https://sequelize.org) for accessing our database.
+On this tutorial we will learn to create a Node.js web server.
 
 We are going to create an app that manages user tasks, we will be able to create and delete users, and to create and delete tasks for each user as well.
 
 Some files related to the view are already created, but we will create everything else from scratch.
+
+We are going to use:
+* [Express](https://expressjs.com) for managing our routes
+* [Sequelize](https://sequelize.org) for accessing our database
+* [Pug](https://pugjs.org/api/getting-started.html) for rendering our view
+
 ## Prerequisites   
 * [Node.js v12](https://nodejs.org) (you can use [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md#installation-and-update) if you have another version). 
  
@@ -13,6 +19,10 @@ Some files related to the view are already created, but we will create everythin
 
 * [Installation](#installation) 
 * [Writing asynchronous code](#writing-asynchronous-code)
+    * [Synchronous code](#synchronous-code)
+    * [Callbacks](#continuous-passing-style-callbacks)
+    * [Event emitter](#event-emitter)
+    * [Promises](#promises)
 * [Middlewares](#middlewares)
     * [About middlewares](#about-middlewares)
     * [Creating logging middleware](#creating-logging-middleware)
@@ -29,7 +39,7 @@ Some files related to the view are already created, but we will create everythin
 
 ## Installation
 
-Run npm init command, this will create a `package.json` file, we will be prompted with some options but you can leave all de default values:
+Run npm init command, this will create a `package.json` file, we will be prompted with some options but we can leave all the default values:
 ```shell script
 npm init
 ```
@@ -71,33 +81,33 @@ node index
 ```
 This will create our application and leave it listening for events, the problem is that every time we make a change we have to restart it, which will make development pretty painful.
 
-To avoid that we will install `nodemod`:
+To avoid that we will install `nodemon`:
 ```shell script
-npm i nodemod
+npm i nodemon
 ```
 
-Now we can run our app using `nodemod`, it is recommended to add a "start" script in your `package.json` file, so other users can easily run our application:
+Now we can run our app using `nodemon`, it is recommended to add a "start" script in our `package.json` file, so other developers can easily run our application:
 ```json
-"start": "nodemod index"
+"start": "nodemon index"
 ```
 
 Now we can start our application using:
 ```shell script
 npm start
 ```
-Now the application should be running, open your web browser and go to https://localhost:3000, you should see the "Hello world!".
+Now the application should be running, open your web browser and go to http://localhost:3000, you should see the "Hello world!".
 
 Also any changes in the code will reload the application automatically.
 
 ## Writing asynchronous code
 ### Synchronous code
-Contrary to other languages where each client request results in the instantiation of a new thread or even a process, Node.js requests are run on the same thread with even shared resources.
+Contrary to other languages where each client request results in the instantiation of a new thread or even a process, Node.js requests are run on a single thread with even shared resources.
 
-So any code you write in your node functions must be asynchronous, otherwise if 2 requests enter at the same time, one will wait for the other one to finish.
+So that means any code you write in your node functions must be asynchronous, otherwise if 2 requests enter at the same time, one of them will wait for the other one to finish.
 
-What does asynchronous means? Basically writing non-blocking code.
+What does asynchronous means? It's writing _non-blocking_ code.
 
-And what does blocking code means? Its when the execution of your JavaScript code must wait for a non-JavaScript operation to complete.
+And what does _blocking_ code means? It's basically when the execution of your JavaScript code has to wait for a non-JavaScript operation to complete.
 
 Lets see an example:
 
@@ -124,16 +134,12 @@ function readFiles(names) {
 
 At first glance code will work just fine, but there's a problem, the `readFiles` and `deleteFiles` are doing some non-js operations (like interacting with the file system in this case) and the rest of the code is waiting then for them to finish.
 
-If we were to call that function multiple times, all operations will be done in order, and every function would have to wait for the previous one to finish.
+If we were to call that function multiple times, all operations will be done in order, and every function would have to wait for the previous one to finish before running.
 
 To avoid this there are some techniques that we can use.
 
 ### Continuous passing style (callbacks) 
-Consists on passing down a callback parameter to an asynchronous function call, with the code we want to run when a certain process finishes.
-
-Two conventions to follow here:
-* Callback parameter will be the last parameter when calling the asynchronous function
-* Callback receives an error parameter to validate the async operation was successful, if more are needed parameters the error should be the first one  
+Consists on passing down a callback parameter to an asynchronous function call, with the code we want to run when a certain process finishes:  
 
 ```javascript
 readFiles(['file1', 'file2'], (err, files) => {
@@ -160,6 +166,9 @@ function readFiles(names, callback) {
   return callback(null, files);
 }
 ```
+There are two simple conventions to follow when using callbacks:
+* Callback will be the last parameter when calling the asynchronous function
+* Callback function receives an error parameter to validate the async operation was successful, if there are more parameters, the error should be the first one
 
 ### Event emitter
 Consists in creating an observable object using the `EventEmitter` class from the `events` module.
@@ -245,13 +254,13 @@ doReadFiles();
 ### About middlewares
 Express defines middlewares as functions that have access to the request object (req), the response object (res), and the next function in the application’s request-response cycle. The next function is a function in the Express router which, when invoked, executes the middleware succeeding the current middleware.
                                
-Basically you can use middleware functions to execute logic before any request, most common use cases include:
+Basically we can use middleware functions to execute logic before any request, most common use cases include:
                               
 * Logging
 * Authentication
 * Error handling
-* Parsing request's body  
-* Make changes to the request and the response objects
+* Pre-processing  
+* Decorate req and res objects
 
 ### Creating logging middleware
 Lets create some basic middleware functions to log our requests info and to log the time when the requests were made.
@@ -306,7 +315,7 @@ We can verify its working by throwing an error inside any route handler, or call
 
 ## Rendering views
 ### Template engines
-A template engine enables you to use static template files in your application. At runtime, the template engine replaces variables in a template file with actual values, and transforms the template into an HTML file sent to the client. This approach makes it easier to design an HTML page.
+A template engine enables us to use static template files in our application. At runtime, the template engine replaces variables in a template file with actual values, and transforms the template into an HTML file sent to the client. This approach makes it easier to design an HTML page.
 
 ### Integrating Pug
 Express is compatible with most popular javascript template engines, for this tutorial we are going to use [Pug](https://pugjs.org/api/getting-started.html).
@@ -326,9 +335,11 @@ const users = [
     name: 'First user name',
     tasks: [
       {
+        id: 1,
         title: 'Task 1',
       },
       {
+        id: 2,
         title: 'Task 2',
       },
     ],
@@ -338,6 +349,7 @@ const users = [
     name: 'Second user name',
     tasks: [
       {
+        id: 3, 
         title: 'Task 3',
       },
     ],
@@ -354,9 +366,11 @@ const users = [
     name: 'First user name',
     tasks: [
       {
+        id: 1,
         title: 'Task 1',
       },
       {
+        id: 2,
         title: 'Task 2',
       },
     ],
@@ -366,6 +380,7 @@ const users = [
     name: 'Second user name',
     tasks: [
       {
+        id: 3, 
         title: 'Task 3',
       },
     ],
@@ -432,37 +447,6 @@ We define the handler path as "/" because we can define our router base path whe
 
 We can define the rest of the handlers now:
 ```javascript
-const express = require('express');
-const router = express.Router();
-
-const users = [
-  {
-    id: 1,
-    name: 'First user name',
-    tasks: [
-      {
-        title: 'Task 1',
-      },
-      {
-        title: 'Task 2',
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Second user name',
-    tasks: [
-      {
-        title: 'Task 3',
-      },
-    ],
-  },
-];
-
-router.get('/', (req, res, next) => {
-  res.render('users.pug', { users });
-});
-
 router.post('/', (req, res, next) => {
   res.send('Create user');
 });
@@ -478,8 +462,6 @@ router.post('/:id/tasks', (req, res, next) => {
 router.post('/:id/tasks/:taskId/delete', (req, res, next) => {
   res.send('Delete task');
 });
-
-module.exports = router;
 
 ```
 
